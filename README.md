@@ -1,7 +1,5 @@
 # 17-KabirSandrolini-Temporal-data-with-tsibble
-Workshop presentation by Kabir Sandrolini &amp; Maren Rieker
-
-Working with temporal data using tsibble
+Workshop presentation by Kabir Sandrolini &amp; Maren Rieker on analyzing temporal data in R using tsibble.
 
 ## Summary
 
