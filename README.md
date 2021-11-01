@@ -20,6 +20,6 @@ This repository provides materials for a session that is part of the [I2DS Tools
 
 
 ## License
-
+The material in this repository is made available under the [MIT license](http://opensource.org/licenses/mit-license.php).
 
 ## Statement of contributions
