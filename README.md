@@ -22,12 +22,12 @@ This repository provides materials for a session that is part of the [I2DS Tools
 
 ## Further resources
 
-- [Intro to tsibble] (https://tsibble.tidyverts.org/articles/intro-tsibble.html)
-- [Introductory slides prepared by package author Earo Wang] (https://slides.earo.me/jsm19/#1)
-- [Detailed working paper explaining the uses and strengths of tsibble] (https://www.monash.edu/business/ebs/our-research/publications/ebs/wp12-2019.pdf)
-- [Detailed tsibble documentation] (https://cran.r-project.org/web/packages/tsibble/tsibble.pdf)
-- [Blog post by Earo Wang with applied example] (https://blog.earo.me/2018/12/20/reintro-tsibble/)
-- [Intro to fable] (https://fable.tidyverts.org)
+- [Intro to tsibble](https://tsibble.tidyverts.org/articles/intro-tsibble.html)
+- [Introductory slides prepared by package author Earo Wang](https://slides.earo.me/jsm19/#1)
+- [Detailed working paper explaining the uses and strengths of tsibble](https://www.monash.edu/business/ebs/our-research/publications/ebs/wp12-2019.pdf)
+- [Detailed tsibble documentation](https://cran.r-project.org/web/packages/tsibble/tsibble.pdf)
+- [Blog post by Earo Wang with applied example](https://blog.earo.me/2018/12/20/reintro-tsibble/)
+- [Intro to fable](https://fable.tidyverts.org)
 
 ## License
 
