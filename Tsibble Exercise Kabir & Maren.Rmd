@@ -1,0 +1,174 @@
+---
+title: "Tsibble Exercise"
+author: "Maren Rieker & Kabir Sandrolini"
+date: "11/1/2021"
+output: html_document
+---
+
+## Packages Used
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tsibbledata)
+library(tidyverse)
+library(tsibble)
+library(lubridate)
+library(ggplot2)
+```
+
+## Retrieving Data
+
+In this example, we use a data set from the tsibbledata package, nyc_bikes
+(<https://github.com/tidyverts/tsibbledata>). nyc_bikes contains information
+on trips taken in 2018 using NYC rental bikes. The bike_id helps to uniquely 
+identify each observation, and the start_time serves as the index. It is an 
+**irregular** tsibble, because bike rentals occur at different time intervals.
+
+As a first step, please assign the data frame to an object and check its format.
+
+```{r}
+example <- nyc_bikes
+example
+class(example)
+
+```
+
+## Tidy Data
+
+Tip: For tidying our data, think of the tidy data process Kabir told you about
+earlier.
+
+```{r}
+#check for duplicates
+duplicates(example, index = start_time)
+
+#check for time gaps
+has_gaps(example, .full = FALSE)
+
+count_gaps(example, )
+
+example %>% scan_gaps()
+
+example %>% fill_gaps()
+
+#as you may notice, tsibble is quite flexible with the arguments you can
+#provide while checking your data for any problems
+```
+
+## Working with our Tsibble
+
+#Exercise 1
+At the end of this exercise, we want to illustrate for how long different
+customers have used the bikes. We want to differentiate customers
+by birth year and gender.
+
+```{r}
+#clean up the gender column
+example %>% count(gender == "Unknown")
+
+bikes_nyc <- filter(example, gender != "Unknown")
+
+bikes_nyc %>% count(gender)
+
+#calculate the renting duration and update the tsibble
+class(example$start_time)
+class(example$stop_time)
+
+bikes <- bikes_nyc %>%
+  group_by_key(c(gender, type)) %>%
+  mutate(duration = difftime(stop_time, start_time,
+                             units = "mins")) %>%
+  update_tsibble(index = duration, 
+                 validate = FALSE)
+```
+
+## Plot the results for a visual overview of the data
+
+```{r}
+class(bikes$duration)
+bikes$duration <- as.numeric(bikes$duration)
+
+ggplot(bikes, aes(x = duration)) + geom_histogram() + xlim(0, 150)
+
+ggplot(bikes_nyc, aes(x = birth_year, y = bikes$duration, color = gender)) + 
+  geom_point(alpha = 0.2) + scale_x_continuous() + scale_y_time() + 
+  ylim(0, 60) + theme(axis.text.x = element_text(angle = 90)) + 
+  facet_wrap(~month(bikes_nyc$start_time)) + 
+  labs(x = "Year of Birth", y = "Duration of Trip in Minutes", color = 
+         "Gender")
+```
+
+#Exercise 2
+The goal of this exercise is again a visualisation of certain information we can
+obtain through the nyc_bikes data set.
+
+Here, you can practice how to set up a tsibble. Because we use the same data
+set as before, you do not need to check and tidy the data again. 
+
+```{r}
+nycbikes_ts <- nyc_bikes %>% 
+   as_tsibble(key = bike_id, index = start_time, regular = FALSE)
+
+```
+
+But we want to transform the temporal data a bit differently this time around - 
+measuring the duration of trips in minutes without decimals and compute a 
+variable that contains the start hour for each rented bike.
+
+```{r}
+nyc2 <- nycbikes_ts %>% mutate(duration_mins = as.numeric(
+   round(difftime(stop_time, start_time, units = "mins"),0)))
+
+#index by start_hour
+nyc2 %>% 
+   index_by(start_hour = floor_date(start_time, unit = "1 hour"))
+
+#extract general start hour and date from more specific timestamp data
+nyc3 <- nyc2 %>% 
+   mutate(start_hour = floor_date(start_time, unit = "1 hour")) %>% 
+   mutate(date = as_date(start_hour), time = hour(start_hour)) %>% 
+   filter(gender != "Unknown")
+
+#differentiate again by gender
+nyc3 %>% ggplot(aes(x = date, y = duration_mins, colour = gender)) + 
+   geom_point(size = 0.5, alpha = 0.5) + ylim(0, 120) + labs(x = "Date", 
+              y = "Duration in Minutes", color = "Gender", title = 
+                "Length of trips over the year by gender")
+```
+
+Now we plot again. This time, please visualise the duration of rentals
+noting the different kind of users, customers who have a subscription and 
+one-time users.
+
+```{r}
+nyc3 %>% ggplot(aes(x = date, y = duration_mins, colour = type)) + 
+   geom_point(size = 0.5, alpha = 0.5) + ylim(0, 120) + labs(x = "Date", 
+              y = "Duration in Minutes", color = "Type", title = 
+                "Length of trips over the year by subscription type")
+```
+
+Also very interesting (and great to do with tsibble :-)) is to look at the
+rate of people renting bikes over the year.
+
+```{r}
+#summarize total number of trips by hour, using the start hour as index
+hourly_trips <- nyc2 %>% 
+   index_by(start_hour = floor_date(start_time, unit = "1 hour")) %>% 
+   summarise(ntrips = n())
+
+#fill any gaps, and add column for date
+full_trips <- hourly_trips %>% 
+   fill_gaps(ntrips = 0L) %>%
+   mutate(date = as_date(start_hour), time = hour(start_hour), 
+          month = month(date))
+
+#visualise trips per hour by date over the course of the year
+full_trips %>% ggplot(aes(x = date, y = ntrips)) + geom_line() + 
+  labs(x = "Date", y = "Trips per hour and bike")
+
+#plotting a smoothing line, we find that the number of trips are highly 
+#correlated with the seasons, declining as the weather gets colder.
+full_trips %>% ggplot(aes(x = month, y = ntrips)) + geom_smooth() + 
+   scale_x_discrete(limits = month.abb) + labs(x = "Month")
+```
