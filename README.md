@@ -7,13 +7,13 @@ This repository provides materials for a session that is part of the [I2DS Tools
 
 ### Session contents
 - Slides introducing and motivating tsibble
-- Interactive exercise walking through the basics of cleaning, wrangling, and modeling temporal data using tsibble.
+- Interactive exercise walking through the basics of cleaning, wrangling, and visualizing temporal data using tsibble.
 
 ### Main learning objectives
 - Understand when it is appropriate to use tsibble, and why it is a powerful upgrade over previous structures
 - Manipulate a tibble/dataframe to tsibble
-- Learn how to tidy your tsibble
-- Perform basic visualizations and modeling using your fancy tidy tsibble
+- Tidy your tsibble, checking for duplicates and gaps
+- Perform basic visualizations with your fancy tidy tsibble
 
 ## Instructors
 
